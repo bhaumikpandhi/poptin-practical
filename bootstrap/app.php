@@ -1,5 +1,7 @@
 <?php
 
+use App\Enums\RoleEnum;
+use App\Models\Role;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -12,7 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
         then: function () {
             Route::prefix('admin')
-                ->middleware('role:admin')
+                ->middleware('web', 'auth', 'role:' . RoleEnum::Admin->value)
                 ->name('admin.')
                 ->group(base_path('routes/admin.php'));
         },

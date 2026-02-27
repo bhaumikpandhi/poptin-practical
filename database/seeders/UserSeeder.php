@@ -30,6 +30,6 @@ class UserSeeder extends Seeder
             'email_verified_at' => now(),
             'password' => bcrypt('DefaultP@ssword1')
         ]);
-        $admin->assignRole(RoleEnum::User->value);
+        $user->assignRole(RoleEnum::User->value);
     }
 }
