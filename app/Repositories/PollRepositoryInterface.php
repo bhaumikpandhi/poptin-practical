@@ -27,4 +27,40 @@ interface PollRepositoryInterface
      * @return bool
      */
     public function recordVote($poll): bool;
+
+    /**
+     * Get listing data for admin poll listing
+     *
+     * @param string $search
+     * @param string $sort
+     * @param int $perPage
+     * @return \Illuminate\Pagination\Paginator
+     */
+    public function getAdminListingData($search = '', $sort = 'created_at-desc', $perPage = 10);
+
+    /**
+     * Create a new poll
+     *
+     * @param array $data
+     * @param int $userId
+     * @return \App\Models\Poll
+     */
+    public function create(array $data, int $userId);
+
+    /**
+     * Update an existing poll
+     *
+     * @param string $pollId
+     * @param array $data
+     * @return \App\Models\Poll
+     */
+    public function update(string $pollId, array $data);
+
+    /**
+     * Delete a poll
+     *
+     * @param \App\Models\Poll $poll
+     * @return void
+     */
+    public function delete($poll);
 }

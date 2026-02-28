@@ -8,7 +8,7 @@
         </li>
 
         <li>
-            <a href="#" class="@if(request()->routeIs('admin.polls*')) active @endif">
+            <a href="{{ route('admin.polls.index') }}" class="@if(request()->routeIs('admin.polls*')) active @endif">
                 <i class="bi bi-bar-chart"></i>
                 Polls
             </a>

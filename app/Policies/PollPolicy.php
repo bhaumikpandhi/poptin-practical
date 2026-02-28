@@ -3,15 +3,23 @@
 namespace App\Policies;
 
 use App\Enums\RoleEnum;
+use App\Models\Poll;
 use App\Models\User;
 
 class PollPolicy
 {
-    /**
-     * Determine whether the user can create models.
-     */
     public function create(?User $user): bool
     {
-        return $user === null || !$user->hasRole(RoleEnum::Admin->value);
+        return $user->hasRole(RoleEnum::Admin->value);
+    }
+
+    public function update(User $user, Poll $poll): bool
+    {
+        return $user->hasRole(RoleEnum::Admin->value) && $user->id === $poll->user_id && $poll->votes()->count() === 0;
+    }
+
+    public function delete(User $user, Poll $poll): bool
+    {
+        return $user->hasRole(RoleEnum::Admin->value) && $user->id === $poll->user_id && $poll->votes()->count() === 0;
     }
 }

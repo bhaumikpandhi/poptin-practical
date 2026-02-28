@@ -10,4 +10,12 @@ trait PollScopes
     {
         $query->where('user_id', $userId);
     }
+
+    public function scopeSearch(Builder $query, $value)
+    {
+        $query->where('question', 'like', '%' . $value . '%')
+            ->orWhereHas('options', function (Builder $q) use ($value) {
+                $q->where('option', 'like', '%' . $value . '%');
+            });
+    }
 }

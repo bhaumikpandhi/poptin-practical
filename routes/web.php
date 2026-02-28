@@ -5,10 +5,6 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\PollController;
 
-Route::get('/', function () {
-    return 'public routes';
-});
-
 Route::middleware('guest')->group(function () {
     Route::get('/login',   [LoginController::class, 'index'])->name('login');
     Route::post('/login',  [LoginController::class, 'login'])->name('post.login');

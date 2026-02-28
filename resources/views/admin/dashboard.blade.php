@@ -42,19 +42,23 @@
                         <table class="table table-hover mb-0">
                             <thead>
                                 <tr>
-                                    <th class="text-muted fw-600" style="font-size: 0.875rem;">Question</th>
-                                    <th class="text-muted fw-600" style="font-size: 0.875rem;">Votes</th>
-                                    <th class="text-muted fw-600" style="font-size: 0.875rem;">Created</th>
+                                    <th class="text-muted fw-semibold" style="font-size: 0.875rem;">Question</th>
+                                    <th class="text-muted fw-semibold" style="font-size: 0.875rem;">Votes</th>
+                                    <th class="text-muted fw-semibold" style="font-size: 0.875rem;">Created</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($dashboardData['top_polls'] as $poll)
+                                @forelse($dashboardData['top_polls'] as $poll)
                                     <tr>
                                         <td>{{ $poll->question }}</td>
                                         <td>{{ $poll->votes_count }}</td>
                                         <td>{{ $poll->created_at->format('M d, Y') }}</td>
                                     </tr>
-                                @endforeach
+                                @empty
+                                    <tr>
+                                        <td colspan="3" class="text-center py-4 text-muted">No polls found</td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
