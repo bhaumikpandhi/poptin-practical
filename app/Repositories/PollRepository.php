@@ -30,15 +30,31 @@ class PollRepository implements PollRepositoryInterface
     }
 
     /**
-     * Record a vote on a poll
+     * Record a vote on a poll for a given option.
      *
      * @param Poll $poll
+     * @param string $optionId
+     * @param string $ipAddress
+     * @param int|null $userId
      * @return bool
      */
-    public function recordVote($poll): bool
+    public function recordVote($poll, string $optionId, string $ipAddress, ?string $userId = null): bool
     {
-        // Business logic for recording a vote
-        // This can be expanded based on your requirements
+        if ($this->hasVoted($poll, $userId, $ipAddress)) {
+            return false;
+        }
+
+        $option = $poll->options()->where('id', $optionId)->first();
+        if (! $option) {
+            return false;
+        }
+
+        $poll->votes()->create([
+            'poll_option_id' => $option->id,
+            'user_id' => $userId,
+            'ip_address' => $ipAddress,
+        ]);
+
         return true;
     }
 
@@ -70,6 +86,44 @@ class PollRepository implements PollRepositoryInterface
             });
 
         return $query->paginate($perPage)->withQueryString();
+    }
+
+    /**
+     * Determine whether the given user or IP has already voted on the poll.
+     *
+     * @param Poll $poll
+     * @param string|null $userId
+     * @param string $ipAddress
+     * @return bool
+     */
+    public function hasVoted($poll, ?string $userId, string $ipAddress): bool
+    {
+        $query = $poll->votes();
+
+        if ($userId) {
+            return $query->where('user_id', $userId)->exists();
+        }
+
+        return $query->whereNull('user_id')->where('ip_address', $ipAddress)->exists();
+    }
+
+    /**
+     * Retrieve the existing vote cast by the user or IP address, if any.
+     *
+     * @param Poll $poll
+     * @param string|null $userId
+     * @param string $ipAddress
+     * @return \App\Models\PollVote|null
+     */
+    public function getUserVote($poll, ?string $userId, string $ipAddress)
+    {
+        $query = $poll->votes();
+
+        if ($userId) {
+            return $query->where('user_id', $userId)->first();
+        }
+
+        return $query->whereNull('user_id')->where('ip_address', $ipAddress)->first();
     }
 
     /**

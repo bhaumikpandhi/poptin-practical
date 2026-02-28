@@ -13,6 +13,15 @@ class PollPolicy
         return $user->hasRole(RoleEnum::Admin->value);
     }
 
+    public function vote(?User $user, Poll $poll): bool
+    {
+        if ($user) {
+            return ! $user->hasRole(RoleEnum::Admin->value);
+        }
+
+        return true;
+    }
+
     public function update(User $user, Poll $poll): bool
     {
         return $user->hasRole(RoleEnum::Admin->value) && $user->id === $poll->user_id && $poll->votes()->count() === 0;
