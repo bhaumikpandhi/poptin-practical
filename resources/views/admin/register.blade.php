@@ -9,7 +9,7 @@
                         <i class="bi bi-bar-chart-fill text-white fs-4"></i>
                     </div>
                     <h5 class="fw-bold mb-0">{{ config('app.name') }}</h5>
-                    <p class="text-muted small mt-1">Sign up to your account</p>
+                    <p class="text-muted small mt-1">Sign Up As Admin</p>
                 </div>
 
                 @if($errors->any())
@@ -18,7 +18,7 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('post.register') }}">
+                <form method="POST" action="{{ route('admin.post.register') }}">
                     @csrf
 
                     <div class="mb-3">

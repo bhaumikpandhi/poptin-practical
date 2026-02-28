@@ -22,7 +22,11 @@ class RegisterRepository implements RegisterRepositoryInterface
             'email_verified_at' => now(),
         ]);
 
-        $user->assignRole(RoleEnum::User->value);
+        if (isset($data['role'])) {
+            $user->assignRole($data['role']);
+        } else {
+            $user->assignRole(RoleEnum::User->value);
+        }
 
         return $user;
     }
