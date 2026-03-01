@@ -36,5 +36,17 @@
                 </ul>
             </div>
         @endauth
+        @guest
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('login') }}">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>
+                            Login
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        @endguest
     </div>
 </nav>

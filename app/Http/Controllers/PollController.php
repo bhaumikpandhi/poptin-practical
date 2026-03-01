@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\VoteCreated;
 use App\Http\Requests\StoreVoteRequest;
 use App\Models\Poll;
 use App\Repositories\PollRepositoryInterface;
@@ -55,6 +56,23 @@ class PollController extends Controller
             return back()->withErrors('You have already voted or the selected option is invalid.');
         }
 
+        event(new VoteCreated($poll));
+
         return back()->with('success', 'Your vote has been recorded.');
+    }
+
+    public function results(Poll $poll)
+    {
+        $poll->load(['options' => function ($q) {
+            $q->withCount('votes');
+        }]);
+
+        $ip = request()->ip();
+        $userId = Auth::id();
+        $hasVoted = $this->pollRepository->hasVoted($poll, $userId, $ip);
+        $userVote = $hasVoted ? $this->pollRepository->getUserVote($poll, $userId, $ip) : null;
+        $totalVotes = $poll->votes()->count();
+
+        return view('user.polls.partials.poll-results', compact('poll', 'hasVoted', 'userVote', 'totalVotes'));
     }
 }
