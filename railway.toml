@@ -1,0 +1,22 @@
+[build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[build.args]
+VITE_REVERB_APP_KEY = "sj2vptspcro3ghxubovf"
+VITE_REVERB_HOST = "poptin-practical-production.up.railway.app"
+VITE_REVERB_PORT = "443"
+VITE_REVERB_SCHEME = "https"
+VITE_APP_NAME = "Poptin Practical"
+
+[deploy]
+startCommand = "/usr/local/bin/start.sh"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
+
+[[services]]
+name = "web"
+
+[[services.ports]]
+port = 80
+protocol = "TCP"

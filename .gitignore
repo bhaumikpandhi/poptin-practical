@@ -1,24 +1,61 @@
-*.log
-.DS_Store
-.env
-.env.backup
-.env.production
-.phpactor.json
-.phpunit.result.cache
-/.fleet
-/.idea
-/.nova
-/.phpunit.cache
-/.vscode
-/.zed
-/auth.json
-/node_modules
-/public/build
-/public/hot
-/public/storage
+# Laravel
+/vendor/
+/node_modules/
+/public/build/
+/public/hot/
+/public/storage/
 /storage/*.key
-/storage/pail
-/vendor
-Homestead.json
-Homestead.yaml
+/storage/app/private/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/testing/*
+/storage/framework/views/*
+/storage/logs/*
+
+# Keep directory structure but ignore contents
+!storage/framework/cache/.gitignore
+!storage/framework/cache/data/.gitignore
+!storage/framework/sessions/.gitignore
+!storage/framework/testing/.gitignore
+!storage/framework/views/.gitignore
+!storage/logs/.gitignore
+!storage/app/.gitignore
+!storage/app/private/.gitignore
+!storage/app/public/.gitignore
+
+# Bootstrap cache
+/bootstrap/cache/*.php
+
+# Environment
+.env
+.env.*
+!.env.example
+!.env.railway
+.env.railway
+
+# Docker (don't ignore, we want these committed)
+# Dockerfile
+# docker-compose.yml
+
+# OS
+.DS_Store
 Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# PHPUnit
+.phpunit.result.cache
+/coverage/
+
+# Misc
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
