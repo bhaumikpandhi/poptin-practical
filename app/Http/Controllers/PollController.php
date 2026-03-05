@@ -6,8 +6,10 @@ use App\Events\VoteCreated;
 use App\Http\Requests\StoreVoteRequest;
 use App\Models\Poll;
 use App\Repositories\PollRepositoryInterface;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Str;
 
 class PollController extends Controller
 {
@@ -45,20 +47,30 @@ class PollController extends Controller
         $ip = $request->ip();
         $userId = Auth::id();
 
-        $recorded = $this->pollRepository->recordVote(
-            $poll,
-            $request->input('option'),
-            $ip,
-            $userId
-        );
+        try {
+            $recorded = $this->pollRepository->recordVote(
+                $poll,
+                $request->input('option'),
+                $ip,
+                $userId
+            );
 
-        if (! $recorded) {
-            return back()->withErrors('You have already voted or the selected option is invalid.');
+            if (! $recorded) {
+                return back()->withErrors('You have already voted or the selected option is invalid.');
+            }
+
+            event(new VoteCreated($poll));
+
+            return back()->with('success', 'Your vote has been recorded.');
+        } catch (QueryException $e) {
+            // Catch database-level constraint violations (unique index violations, etc.)
+            if (Str::contains($e->getMessage(), ['UNIQUE', 'duplicate', 'Duplicate entry'])) {
+                return back()->withErrors('You have already voted on this poll.');
+            }
+
+            // Re-throw the exception if it's not a duplicate vote error
+            throw $e;
         }
-
-        event(new VoteCreated($poll));
-
-        return back()->with('success', 'Your vote has been recorded.');
     }
 
     public function results(Poll $poll)

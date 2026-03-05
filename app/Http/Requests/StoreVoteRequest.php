@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreVoteRequest extends FormRequest
 {
@@ -22,7 +23,11 @@ class StoreVoteRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'option' => ['required', 'exists:poll_options,id'],
+            'option' => [
+                'required',
+                Rule::exists('poll_options', 'id')
+                    ->where('poll_id', $this->route('poll')->id),
+            ],
         ];
     }
 }

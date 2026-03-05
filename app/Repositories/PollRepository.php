@@ -101,10 +101,18 @@ class PollRepository implements PollRepositoryInterface
         $query = $poll->votes();
 
         if ($userId) {
-            return $query->where('user_id', $userId)->exists();
+            return $query
+                ->where(function ($q) use ($userId, $ipAddress) {
+                    $q->where('user_id', $userId)
+                      ->orWhere(function ($q) use ($ipAddress) {
+                          $q->whereNull('user_id')
+                            ->where('ip_address', $ipAddress);
+                      });
+                })
+                ->exists();
         }
 
-        return $query->whereNull('user_id')->where('ip_address', $ipAddress)->exists();
+        return $query->where('ip_address', $ipAddress)->exists();
     }
 
     /**

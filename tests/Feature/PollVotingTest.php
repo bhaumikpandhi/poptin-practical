@@ -63,7 +63,7 @@ class PollVotingTest extends TestCase
         $this->assertDatabaseCount('poll_votes', 1);
     }
 
-    public function test_logged_in_user_does_not_block_guest_same_ip()
+    public function test_logged_in_user_blocked_by_guest_vote_same_ip()
     {
         $user = User::factory()->create();
         $user->assignRole(RoleEnum::User->value);
@@ -71,14 +71,34 @@ class PollVotingTest extends TestCase
         $poll = Poll::factory()->create();
         $options = PollOption::factory()->count(2)->create(['poll_id' => $poll->id]);
 
-        $this->actingAs($user)
-            ->withServerVariables(['REMOTE_ADDR' => '9.8.7.6'])
+        // Guest votes first from IP
+        $this->withServerVariables(['REMOTE_ADDR' => '9.8.7.6'])
             ->post(route('polls.vote', $poll), ['option' => $options[0]->id])
             ->assertSessionHas('success');
         
-        Auth::logout();
+        // Same IP user logs in and tries to vote - should be blocked
+        $this->actingAs($user)
+            ->withServerVariables(['REMOTE_ADDR' => '9.8.7.6'])
+            ->post(route('polls.vote', $poll), ['option' => $options[1]->id])
+            ->assertSessionHasErrors();
 
+        $this->assertDatabaseCount('poll_votes', 1);
+    }
+
+    public function test_guest_later_as_user_different_ip_can_vote()
+    {
+        $user = User::factory()->create();
+        $user->assignRole(RoleEnum::User->value);
+
+        $poll = Poll::factory()->create();
+        $options = PollOption::factory()->count(2)->create(['poll_id' => $poll->id]);
+
+        // Guest votes from IP 1
         $this->withServerVariables(['REMOTE_ADDR' => '9.8.7.6'])
+            ->post(route('polls.vote', $poll), ['option' => $options[0]->id])
+            ->assertSessionHas('success');
+        $this->actingAs($user)
+            ->withServerVariables(['REMOTE_ADDR' => '1.1.1.1'])
             ->post(route('polls.vote', $poll), ['option' => $options[1]->id])
             ->assertSessionHas('success');
 
@@ -99,4 +119,18 @@ class PollVotingTest extends TestCase
 
         $this->assertDatabaseCount('poll_votes', 0);
     }
-}
+
+    public function test_cannot_vote_for_option_from_different_poll()
+    {
+        $poll1 = Poll::factory()->create();
+        $poll2 = Poll::factory()->create();
+        
+        $options1 = PollOption::factory()->count(2)->create(['poll_id' => $poll1->id]);
+        $options2 = PollOption::factory()->count(2)->create(['poll_id' => $poll2->id]);
+
+        $this->withServerVariables(['REMOTE_ADDR' => '1.2.3.4'])
+            ->post(route('polls.vote', $poll1), ['option' => $options2[0]->id])
+            ->assertSessionHasErrors();
+
+        $this->assertDatabaseCount('poll_votes', 0);
+    }}
