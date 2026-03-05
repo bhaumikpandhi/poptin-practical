@@ -128,7 +128,18 @@ class PollRepository implements PollRepositoryInterface
         $query = $poll->votes();
 
         if ($userId) {
-            return $query->where('user_id', $userId)->first();
+            // First try to find vote by user_id
+            $vote = $query->where('user_id', $userId)->first();
+
+            // If not found, fall back to IP-based vote (guest vote before login)
+            if (!$vote) {
+                $vote = $poll->votes()
+                    ->whereNull('user_id')
+                    ->where('ip_address', $ipAddress)
+                    ->first();
+            }
+
+            return $vote;
         }
 
         return $query->whereNull('user_id')->where('ip_address', $ipAddress)->first();
@@ -171,7 +182,7 @@ class PollRepository implements PollRepositoryInterface
         ]);
 
         $poll->options()->delete();
-        
+
         foreach ($data['options'] as $optionData) {
             $poll->options()->create([
                 'option' => $optionData['text'],
