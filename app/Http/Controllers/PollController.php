@@ -30,7 +30,9 @@ class PollController extends Controller
             $q->withCount('votes');
         }]);
 
-        $ip = request()->ip();
+        $ip = app()->environment('production')
+            ? (request()->header('fastly-client-ip') ?? request()->ip())
+            : request()->ip();
         $userId = Auth::id();
         $hasVoted = $this->pollRepository->hasVoted($poll, $userId, $ip);
         $userVote = $hasVoted ? $this->pollRepository->getUserVote($poll, $userId, $ip) : null;
@@ -44,7 +46,9 @@ class PollController extends Controller
     {
         Gate::authorize('vote', $poll);
 
-        $ip = $request->ip();
+        $ip = app()->environment('production')
+            ? (request()->header('fastly-client-ip') ?? request()->ip())
+            : request()->ip();
         $userId = Auth::id();
 
         try {
@@ -79,7 +83,9 @@ class PollController extends Controller
             $q->withCount('votes');
         }]);
 
-        $ip = request()->ip();
+        $ip = app()->environment('production')
+            ? (request()->header('fastly-client-ip') ?? request()->ip())
+            : request()->ip();
         $userId = Auth::id();
         $hasVoted = $this->pollRepository->hasVoted($poll, $userId, $ip);
         $userVote = $hasVoted ? $this->pollRepository->getUserVote($poll, $userId, $ip) : null;
